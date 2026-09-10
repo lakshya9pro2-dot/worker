@@ -1,0 +1,11 @@
+name = "kineflex-api"
+main = "src/index.js"
+compatibility_date = "2024-03-20"
+
+[vars]
+GITHUB_CATALOG_URL = "https://raw.githubusercontent.com/Kineflex/Newflix/refs/heads/main/video.json"
+
+# Uncomment and set up KV for production deployment
+# [[kv_namespaces]]
+# binding = "SESSIONS"
+# id = "YOUR_KV_ID"

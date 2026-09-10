@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Kineflex Resolver",
+  "version": "1.0.0",
+  "description": "Authorized browser-side resolution for Kineflex fallback.",
+  "permissions": [
+    "scripting",
+    "webRequest",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
+    "*://kineflex.site/*",
+    "*://*.kineflex-api.workers.dev/*",
+    "*://vidfast.vc/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://kineflex.site/*", "*://localhost/*", "http://127.0.0.1/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
