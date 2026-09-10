@@ -19,11 +19,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // Also notify via postMessage just in case
     window.postMessage({ type: "KINEFLEX_RESOLVE", requestId: requestId }, "*");
 
-    statusMsg.innerText = "Waiting for resolver...";
-
     // IMPORTANT: Replace this with your actual Cloudflare Worker URL
     const API_BASE = "https://worker.kineflex-netflex.workers.dev";
     
+    // Fetch session immediately to build iframe
+    fetch(`${API_BASE}/api/session/${requestId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.session && data.session.meta) {
+                const meta = data.session.meta;
+                let targetUrl = "";
+                if (meta.type === 'movie') {
+                    targetUrl = `https://vidfast.vc/movie/${meta.id}`;
+                } else if (meta.type === 'tv') {
+                    targetUrl = `https://vidfast.vc/tv/${meta.id}/${meta.season}/${meta.episode}`;
+                }
+                
+                if (targetUrl) {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = targetUrl;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '400px';
+                    iframe.style.border = 'none';
+                    iframe.style.marginTop = '20px';
+                    document.querySelector('.loading-container').appendChild(iframe);
+                }
+            }
+        });
+
     // 2. Start polling the backend for session completion
     let attempts = 0;
     const maxAttempts = 30; // ~ 1 minute
