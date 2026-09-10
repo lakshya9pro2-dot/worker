@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="referrer" content="no-referrer">
+<title>Kineflex</title>
+
+<!-- Favicon -->
+<link rel="icon" href="https://vids.st/storage/thumbs/thumb-90593-1781927771.png">
+
+<!-- Icons -->
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+<!-- JW Player — same CDN build as player_testing.html -->
+<script src="https://ssl.p.jwpcdn.com/player/v/8.26.2/jwplayer.js"></script>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Montserrat", sans-serif;
+  background: #000;
+}
+
+.video-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  color: #fff;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+/* JW Player mounts here and fills the container completely */
+#video_player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.custom-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  height: 150px;
+  z-index: 9999;
+  object-fit: contain;
+  display: block;
+}
+
+/* Top Controls */
+.top-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(to bottom, #000000e6 0%, transparent 100%);
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateY(-40px);
+  visibility: hidden;
+  z-index: 99;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2rem;
+}
+
+.top-controls.show-controls {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.player-info {
+  display: none;
+  align-items: center;
+  gap: 0.6rem;
+  margin-right: auto;
+  min-width: 0;
+}
+
+.player-info.show {
+  display: flex;
+}
+
+.player-logo {
+  height: 28px;
+  display: none;
+}
+
+.player-title {
+  font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.top-control-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+  user-select: none;
+  position: relative;
+}
+
+.top-control-item:hover {
+  opacity: 0.8;
+}
+
+.top-control-item ion-icon {
+  font-size: 1.4rem;
+}
+
+/* Player State Buttons */
+.player-state {
+  display: flex;
+  position: absolute;
+  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 50;
+}
+
+.state-btn {
+  font-size: 2.3rem;
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: rgba(36, 36, 36, 0.667);
+  z-index: 9999;
+  opacity: 0;
+  user-select: none;
+  transform: scale(0);
+}
+
+.state-forward,
+.state-backward {
+  font-size: 1.5rem;
+}
+
+.state-forward .forward-duration {
+  margin-right: 0.5rem;
+}
+
+.state-backward .backward-duration {
+  margin-left: 0.5rem;
+}
+
+.animate-state {
+  animation: playPause 0.5s forwards;
+}
+
+.show-state {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.show-controls {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  visibility: visible !important;
+}
+
+/* Bottom Controls */
+.controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 5rem 1rem 0.5rem 1rem;
+  width: 100%;
+  background: linear-gradient(to top, #000000b8 -100%, transparent);
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateY(40px);
+  visibility: hidden;
+  z-index: 99;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  user-select: none;
+}
+
+.duration {
+  position: relative;
+  width: 100%;
+  height: 15px;
+  background: #62626274;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.duration:hover {
+  height: 17px;
+}
+
+.duration .buffer {
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  background-color: #ff6a0045;
+  z-index: 9;
+  width: 0;
+}
+
+.hover-time {
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  background: #ffffff9a;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  width: 0;
+}
+
+.hover-time .hover-duration {
+  position: absolute;
+  right: calc((-25px / 2));
+  top: -25px;
+  background: #3c3c3ca7;
+  padding: 0.2rem;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  visibility: hidden;
+  font-weight: bold;
+  opacity: 0;
+  transform: scale(0);
+}
+
+.duration:hover .hover-time .hover-duration {
+  visibility: visible;
+  opacity: 1;
+  transition: all 0.2s;
+  transform: scale(1);
+}
+
+.duration .current-time {
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  background: #ff6a00;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  width: 0;
+}
+
+.current-time::before {
+  content: "";
+  position: absolute;
+  right: calc((-25px / 2));
+  background: #ff6a00;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  visibility: hidden;
+  transform: scale(0);
+}
+
+.duration:hover .current-time::before {
+  visibility: visible;
+  transform: scale(1);
+}
+
+.btn-controls {
+  padding-top: 1rem;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.btn-con {
+  display: flex;
+  align-items: center;
+}
+
+.btn-con,
+.btn-controls > span {
+  cursor: pointer;
+}
+
+.play-pause {
+  display: flex;
+  margin-right: 0.5rem;
+}
+
+.control-btn {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: #33333372;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  position: relative;
+  margin-right: 0.5rem;
+}
+
+.control-btn:last-child {
+  margin-right: 0;
+}
+
+.control-btn:hover {
+  border: 1px solid #3131315c;
+}
+
+.control-btn::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #2424246a;
+  position: absolute;
+  transition: all 0.1s;
+  transform: scale(0);
+}
+
+.control-btn:active::before {
+  transform: scale(1);
+  border: 1px solid #3131315c;
+}
+
+.time-container {
+  font-size: 13px;
+  font-weight: 500;
+  padding-left: 0.7rem;
+}
+
+.volume {
+  display: flex;
+  align-items: center;
+  cursor: default;
+}
+
+.mute-unmute {
+  display: flex;
+  cursor: pointer;
+}
+
+.max-vol {
+  height: 3px;
+  cursor: pointer;
+  background: #ffffff6e;
+  transition: all 0.1s;
+  width: 0;
+  visibility: hidden;
+  transform: scaleX(0);
+  transform-origin: left;
+  display: flex;
+  align-items: center;
+}
+
+.max-vol.show {
+  width: 56px;
+  visibility: visible;
+  transform: scaleX(1);
+}
+
+.current-vol {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  transition: none;
+  align-items: center;
+}
+
+.current-vol::before {
+  content: "";
+  position: absolute;
+  right: -5px;
+  width: 12px;
+  height: 12px;
+  display: block;
+  border-radius: 50%;
+  background: #eee;
+}
+
+/* Bottom settings dropdown (Quality + Speed) and top Audio/Subtitle dropdown share this look */
+.setting-menu,
+.subtitle-menu {
+  opacity: 0;
+  visibility: hidden;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  transition: all 0.2s;
+  background: rgba(28, 28, 28, 0.95);
+  transform: scaleY(0);
+  border-radius: 5px;
+  min-width: 200px;
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 999;
+}
+
+.setting-menu {
+  bottom: 4.5rem;
+  transform-origin: bottom;
+}
+
+.subtitle-menu {
+  top: 3.2rem;
+  right: 0;
+  transform-origin: top;
+}
+
+.setting-menu .menu-item,
+.subtitle-menu .menu-item {
+  padding: 0.7rem 1.5rem;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.setting-menu .menu-header,
+.subtitle-menu .menu-header {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.75rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: default;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.speed-active,
+.quality-active,
+.sub-active {
+  background: rgb(23, 23, 23);
+}
+
+.setting-menu .menu-item:hover,
+.subtitle-menu .menu-item:hover {
+  background: rgb(31, 31, 31);
+}
+
+.setting-btn {
+  display: flex;
+}
+
+.show-setting-menu {
+  opacity: 1;
+  transform: scaleY(1);
+  visibility: visible;
+}
+
+.right-controls {
+  display: flex;
+  align-items: center;
+}
+
+.right-controls span {
+  cursor: pointer;
+}
+
+.full,
+.contract {
+  display: none;
+}
+
+.video-container:not(.fullscreen) .full {
+  display: flex;
+}
+
+.video-container.fullscreen .contract {
+  display: flex;
+}
+
+.fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: #000 !important;
+}
+
+@keyframes playPause {
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
+</head>
+<body>
+  <div class="video-container">
+    <!-- Top Controls -->
+    <div class="top-controls">
+      <div class="player-info" id="playerInfo">
+        <img class="player-logo" id="playerLogo" alt="logo">
+        <span class="player-title" id="playerTitle"></span>
+      </div>
+
+      <div class="top-control-item" id="speedControl">
+        <ion-icon name="speedometer-outline"></ion-icon>
+        <span>Speed (<span id="currentSpeed">1x</span>)</span>
+      </div>
+      <div class="top-control-item" id="lockControl">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+        <span>Lock</span>
+      </div>
+      <div class="top-control-item" id="audioSubControl">
+        <ion-icon name="chatbox-outline"></ion-icon>
+        <span>Audio &amp; Subtitles</span>
+
+        <!-- Subtitle track list — populated live from JW's captionsList event -->
+        <ul class="subtitle-menu" id="subtitleMenu">
+          <li class="menu-header">Subtitles</li>
+          <div class="subtitle-list" id="subtitleList"></div>
+        </ul>
+      </div>
+    </div>
+
+    <!-- JW Player mounts here -->
+    <div id="video_player"></div>
+
+    <img class="custom-loader" src="https://vids.st/storage/thumbs/thumb-91548-1781948457.gif" alt="Loading...">
+
+    <div class="player-state">
+      <span class="state-btn state-backward">
+        <ion-icon name="play-back-outline"></ion-icon>
+        <span class="backward-duration">10</span>
+      </span>
+      <span class="main-state state-btn">
+        <ion-icon name="play-outline"></ion-icon>
+      </span>
+      <span class="state-btn state-forward">
+        <span class="forward-duration">10</span>
+        <ion-icon name="play-forward-outline"></ion-icon>
+      </span>
+    </div>
+
+    <div class="controls">
+      <div class="duration">
+        <div class="current-time"></div>
+        <div class="hover-time"><span class="hover-duration"></span></div>
+        <div class="buffer"></div>
+      </div>
+      <div class="btn-controls">
+        <div class="btn-con">
+          <span class="play-pause control-btn">
+            <ion-icon name="play-outline"></ion-icon>
+          </span>
+          <span class="volume">
+            <span class="mute-unmute control-btn">
+              <ion-icon name="volume-high-outline"></ion-icon>
+            </span>
+            <div class="max-vol"><div class="current-vol"></div></div>
+          </span>
+          <span class="time-container">
+            <span class="current-duration">0:00</span> /
+            <span class="total-duration">0:00</span>
+          </span>
+        </div>
+        <div class="right-controls">
+          <span class="backward control-btn">
+            <ion-icon name="play-back-outline"></ion-icon>
+          </span>
+          <span class="forward control-btn">
+            <ion-icon name="play-forward-outline"></ion-icon>
+          </span>
+          <span class="settings control-btn">
+            <span class="setting-btn">
+              <ion-icon name="options-outline"></ion-icon>
+            </span>
+            <ul class="setting-menu" id="settingMenu">
+              <li class="menu-header">Quality</li>
+              <!-- Populated live from JW's "levels" event -->
+              <div class="quality-list" id="qualityList"></div>
+              <li class="menu-header">Playback Speed</li>
+              <div class="menu-item" data-value="0.25">0.25x</div>
+              <div class="menu-item" data-value="0.5">0.5x</div>
+              <div class="menu-item" data-value="0.75">0.75x</div>
+              <div class="menu-item speed-active" data-value="1">1x</div>
+              <div class="menu-item" data-value="1.25">1.25x</div>
+              <div class="menu-item" data-value="1.5">1.5x</div>
+              <div class="menu-item" data-value="1.75">1.75x</div>
+              <div class="menu-item" data-value="2">2x</div>
+            </ul>
+          </span>
+          <span class="fullscreen-btn control-btn" id="fullscreenBtn">
+            <span class="full">
+              <ion-icon name="scan-outline"></ion-icon>
+            </span>
+            <span class="contract">
+              <ion-icon name="contract-outline"></ion-icon>
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   SECTION 1 – MOBILE DETECTION (ported from player_testing.html)
+═══════════════════════════════════════════════════════════ */
+const isMobile = {
+  Android:    () => navigator.userAgent.match(/Android/i),
+  BlackBerry: () => navigator.userAgent.match(/BlackBerry/i),
+  iOS:        () => navigator.userAgent.match(/iPhone|iPad|iPod/i),
+  Opera:      () => navigator.userAgent.match(/Opera Mini/i),
+  Windows:    () => navigator.userAgent.match(/IEMobile|WPDesktop/i),
+  any() {
+    return this.Android() || this.BlackBerry() || this.iOS()
+        || this.Opera()   || this.Windows();
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 2 – VIDEO METADATA
+═══════════════════════════════════════════════════════════ */
+let videoID  = '69d76ed94647d';
+let userID   = '126696';
+
+let urlPlay  = 'https://cdn4.turboviplay.com/data3/6a3633974f08d/6a3633974f08d.m3u8';
+let urlSub   = '';
+let poster   = 'https://vids.st/storage/thumbs/thumb-91548-1781948457.gif';
+
+let urlLogo  = '';
+let title    = '';
+
+/* JW Player license key (from player_testing.html) */
+const JW_KEY   = 'ITWMv7t88JGzI0xPwW8I0+LveiXX9SWbfdmt0ArUSyc=';
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 3 – LANGUAGE CODE MAP
+═══════════════════════════════════════════════════════════ */
+const languageCodes = {
+  // Common / Major Languages
+  eng: 'English',
+  spa: 'Spanish',
+  fra: 'French',
+  fre: 'French',
+  deu: 'German',
+  ger: 'German',
+  zho: 'Chinese',
+  chi: 'Chinese',
+  cmn: 'Mandarin Chinese',
+  yue: 'Cantonese Chinese',
+  nan: 'Min Nan Chinese',
+  hak: 'Hakka Chinese',
+  wuu: 'Wu Chinese',
+  jpn: 'Japanese',
+  kor: 'Korean',
+  por: 'Portuguese',
+  rus: 'Russian',
+  ita: 'Italian',
+  nld: 'Dutch',
+  dut: 'Dutch',
+  swe: 'Swedish',
+  nor: 'Norwegian',
+  dan: 'Danish',
+  fin: 'Finnish',
+  pol: 'Polish',
+  ces: 'Czech',
+  cze: 'Czech',
+  slk: 'Slovak',
+  slo: 'Slovak',
+  hun: 'Hungarian',
+  ron: 'Romanian',
+  rum: 'Romanian',
+  bul: 'Bulgarian',
+  hrv: 'Croatian',
+  srp: 'Serbian',
+  slv: 'Slovene',
+  est: 'Estonian',
+  lav: 'Latvian',
+  lit: 'Lithuanian',
+  ukr: 'Ukrainian',
+  bel: 'Belarusian',
+  ell: 'Greek',
+  gre: 'Greek',
+  tur: 'Turkish',
+  heb: 'Hebrew',
+  ara: 'Arabic',
+  fas: 'Persian',
+  per: 'Persian',
+  hin: 'Hindi',
+  ben: 'Bengali',
+  tam: 'Tamil',
+  tel: 'Telugu',
+  kan: 'Kannada',
+  mal: 'Malayalam',
+  mar: 'Marathi',
+  guj: 'Gujarati',
+  pan: 'Punjabi',
+  urd: 'Urdu',
+  nep: 'Nepali',
+  sin: 'Sinhala',
+  mya: 'Burmese',
+  khm: 'Khmer',
+  lao: 'Lao',
+  tha: 'Thai',
+  vie: 'Vietnamese',
+  ind: 'Indonesian',
+  msa: 'Malay',
+  may: 'Malay',
+  tgl: 'Tagalog',
+  fil: 'Filipino',
+  cat: 'Catalan',
+  eus: 'Basque',
+  baq: 'Basque',
+  glg: 'Galician',
+  aze: 'Azerbaijani',
+  kat: 'Georgian',
+  geo: 'Georgian',
+  hye: 'Armenian',
+  arm: 'Armenian',
+  kaz: 'Kazakh',
+  uzb: 'Uzbek',
+  tuk: 'Turkmen',
+  kir: 'Kyrgyz',
+  tgk: 'Tajik',
+  mon: 'Mongolian',
+  swa: 'Swahili',
+  afr: 'Afrikaans',
+  zul: 'Zulu',
+  xho: 'Xhosa',
+  sot: 'Southern Sotho',
+  tsn: 'Tswana',
+  ssw: 'Swati',
+  ven: 'Venda',
+  tso: 'Tsonga',
+  nso: 'Northern Sotho',
+  nde: 'Northern Ndebele',
+  sna: 'Shona',
+  nya: 'Nyanja',
+  run: 'Rundi',
+  kin: 'Kinyarwanda',
+  mlg: 'Malagasy',
+  som: 'Somali',
+  amh: 'Amharic',
+  tir: 'Tigrinya',
+  orm: 'Oromo',
+  hau: 'Hausa',
+  yor: 'Yoruba',
+  ibo: 'Igbo',
+  wol: 'Wolof',
+  ful: 'Fulah',
+  bam: 'Bambara',
+  aka: 'Akan',
+  ewe: 'Ewe',
+  gaa: 'Ga',
+  lin: 'Lingala',
+  kon: 'Kongo',
+  lub: 'Luba-Katanga',
+  mfe: 'Morisyen',
+  gug: 'Guarani',
+  grn: 'Guarani',
+  que: 'Quechua',
+  aym: 'Aymara',
+  arn: 'Mapudungun',
+  hat: 'Haitian Creole',
+  pap: 'Papiamento',
+  jam: 'Jamaican Patois',
+  haw: 'Hawaiian',
+  smo: 'Samoan',
+  ton: 'Tongan',
+  fij: 'Fijian',
+  mri: 'Maori',
+  mao: 'Maori',
+  bis: 'Bislama',
+  div: 'Divehi',
+  dzo: 'Dzongkha',
+  snd: 'Sindhi',
+  ori: 'Odia',
+  asm: 'Assamese',
+  kok: 'Konkani',
+  san: 'Sanskrit',
+  lat: 'Latin',
+  cym: 'Welsh',
+  wel: 'Welsh',
+  gle: 'Irish',
+  iri: 'Irish',
+  gla: 'Scottish Gaelic',
+  cor: 'Cornish',
+  bre: 'Breton',
+  isl: 'Icelandic',
+  ice: 'Icelandic',
+  fao: 'Faroese',
+  yid: 'Yiddish',
+  yji: 'Yiddish',
+  ltz: 'Luxembourgish',
+  frs: 'East Frisian',
+  fry: 'West Frisian',
+  lim: 'Limburgish',
+  cos: 'Corsican',
+  oci: 'Occitan',
+  srd: 'Sardinian',
+  roh: 'Romansh',
+  fur: 'Friulian',
+  lad: 'Ladino',
+  ast: 'Asturian',
+  psh: 'Pushto',
+  pus: 'Pashto',
+  kur: 'Kurdish',
+  kmr: 'Kurmanji Kurdish',
+  ckb: 'Sorani Kurdish',
+  kmx: 'Southern Kurdish',
+  uig: 'Uyghur',
+  tib: 'Tibetan',
+  bod: 'Tibetan',
+  mlt: 'Maltese',
+  sqi: 'Albanian',
+  alb: 'Albanian',
+  mkd: 'Macedonian',
+  mac: 'Macedonian',
+  bos: 'Bosnian',
+  rup: 'Aromanian',
+  smi: 'Sami',
+  sme: 'Northern Sami',
+  sma: 'Southern Sami',
+  smj: 'Lule Sami',
+  smn: 'Inari Sami',
+  sms: 'Skolt Sami',
+  kom: 'Komi',
+  udm: 'Udmurt',
+  mhr: 'Meadow Mari',
+  mrj: 'Hill Mari',
+  chm: 'Mari',
+  myv: 'Erzya',
+  mdf: 'Moksha',
+  krl: 'Karelian',
+  vep: 'Veps',
+  vot: 'Votic',
+  liv: 'Livonian',
+  tat: 'Tatar',
+  chv: 'Chuvash',
+  bak: 'Bashkir',
+  sah: 'Yakut',
+  tyv: 'Tuvinian',
+  xal: 'Kalmyk',
+  kbd: 'Kabardian',
+  che: 'Chechen',
+  ing: 'Ingush',
+  ava: 'Avar',
+  lez: 'Lezghian',
+  dar: 'Dargwa',
+  lak: 'Lak',
+  tab: 'Tabasaran',
+  abk: 'Abkhazian',
+  oss: 'Ossetian',
+  kab: 'Kabyle',
+  shi: 'Tachelhit',
+  tzm: 'Central Atlas Tamazight',
+  rif: 'Riffian',
+  zen: 'Zenaga',
+  tua: 'Tamahaq',
+  tmh: 'Tamashek'
+};
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 4 – DOM REFERENCES
+   NOTE: there's no <video> element to grab — JW Player creates
+   its own internal video element inside #video_player. Every
+   control below talks to JW through its player API instead.
+═══════════════════════════════════════════════════════════ */
+let player = null; // set once jwplayer('video_player') is created
+
+const fullscreenBtn = document.getElementById("fullscreenBtn");
+const playPause = document.querySelector(".play-pause");
+const volume = document.querySelector(".volume");
+const currentTime = document.querySelector(".current-time");
+const duration = document.querySelector(".duration");
+const buffer = document.querySelector(".buffer");
+const totalDuration = document.querySelector(".total-duration");
+const currentDuration = document.querySelector(".current-duration");
+const controls = document.querySelector(".controls");
+const topControls = document.querySelector(".top-controls");
+const videoContainer = document.querySelector(".video-container");
+const currentVol = document.querySelector(".current-vol");
+const totalVol = document.querySelector(".max-vol");
+const mainState = document.querySelector(".main-state");
+const muteUnmute = document.querySelector(".mute-unmute");
+const forward = document.querySelector(".forward");
+const backward = document.querySelector(".backward");
+const hoverTime = document.querySelector(".hover-time");
+const hoverDuration = document.querySelector(".hover-duration");
+const settingsBtn = document.querySelector(".setting-btn");
+const settingMenu = document.getElementById("settingMenu");
+const qualityList = document.getElementById("qualityList");
+const speedButtons = document.querySelectorAll(".setting-menu .menu-item[data-value]");
+const backwardSate = document.querySelector(".state-backward");
+const forwardSate = document.querySelector(".state-forward");
+const loader = document.querySelector(".custom-loader");
+const currentSpeedDisplay = document.getElementById("currentSpeed");
+const audioSubControl = document.getElementById("audioSubControl");
+const subtitleMenu = document.getElementById("subtitleMenu");
+const subtitleList = document.getElementById("subtitleList");
+const playerInfo = document.getElementById("playerInfo");
+const playerLogo = document.getElementById("playerLogo");
+const playerTitle = document.getElementById("playerTitle");
+
+let isPlaying = false,
+  mouseDownProgress = false,
+  mouseDownVol = false,
+  isCursorOnControls = false,
+  muted = false,
+  timeout,
+  volumeVal = 1,
+  mouseOverDuration = false,
+  touchClientX = 0,
+  touchPastDurationWidth = 0,
+  touchStartTime = 0,
+  isLocked = false,
+  lastKnownDuration = 0;
+
+let videoQuality = '';
+let url4K = '';
+
+currentVol.style.width = volumeVal * 100 + "%";
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 5 – PLAYER SETUP (JW Player)
+   controls:false hides JW's own skin entirely — every button
+   on screen is the custom UI, driving playback through JW's
+   API (player.play/pause/seek/setVolume/...) and JW's events.
+═══════════════════════════════════════════════════════════ */
+async function setupPlayer() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const idParam = urlParams.get('id');
+  const urlParam = urlParams.get('url');
+  const ttidParam = urlParams.get('ttid');
+
+  if (idParam || urlParam || ttidParam) {
+    try {
+      let matchedVideo = null;
+      let matchedMovie = null;
+
+      // 1. Fetch video.json
+      try {
+        const response = await fetch('https://kinflexbackend.onrender.com/video.json');
+        if (response.ok) {
+          const videoData = await response.json();
+          if (ttidParam) {
+            const playId = ttidParam.startsWith('tt') ? ttidParam.substring(2) : ttidParam;
+            matchedVideo = videoData.find(item => 
+              String(item.play) === String(playId) || 
+              String(item.id) === String(ttidParam) ||
+              String(item.play) === String(ttidParam)
+            );
+          }
+          if (!matchedVideo && idParam) {
+            matchedVideo = videoData.find(item => String(item.id) === String(idParam));
+          }
+          if (!matchedVideo && urlParam) {
+            matchedVideo = videoData.find(item => item.playUrl === urlParam || String(item.id) === String(urlParam));
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load video.json:", e);
+      }
+
+      // If ttidParam is provided but no video matched, create a placeholder object
+      if (ttidParam && !matchedVideo) {
+        const playId = ttidParam.startsWith('tt') ? ttidParam.substring(2) : ttidParam;
+        matchedVideo = {
+          id: playId,
+          play: playId,
+          title: title || 'Video',
+          playUrl: '',
+          urlSub: '',
+          poster: poster
+        };
+      }
+
+      // 2. Fetch data.json
+      try {
+        const res = await fetch('https://kinflexbackend.onrender.com/data.json');
+        if (res.ok) {
+          const data = await res.json();
+          const targetId = idParam || (matchedVideo ? matchedVideo.id : null);
+          if (targetId) {
+            const keys = ['heroMovies', 'trendingMovies', 'newArrivalsMovies', 'latestMovies', 'top10Movies', 'popularMovies', 'actionMovies', 'webSeries'];
+            for (const key of keys) {
+              if (data[key]) {
+                const found = data[key].find(m => String(m.id) === String(targetId));
+                if (found) {
+                  matchedMovie = found;
+                  break;
+                }
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load data.json:", e);
+      }
+
+      // Resolve turbovidhls variables if "play" code is present
+      if (matchedVideo && matchedVideo.play) {
+        try {
+          const res = await fetch(`https://kinflexbackend.onrender.com/api/url?id=${matchedVideo.id}`);
+          if (res.ok) {
+            const apiData = await res.json();
+            if (apiData.success) {
+              matchedVideo.playUrl = apiData.urlPlay;
+              matchedVideo.urlSub  = apiData.urlSub;
+              matchedVideo.poster  = apiData.poster;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to resolve turbovidhls variables:", e);
+        }
+      }
+
+      // 3. Populate metadata by merging video.json and data.json
+      if (matchedVideo) {
+        videoID = String(matchedVideo.id);
+        urlPlay = matchedVideo.playUrl || urlPlay;
+        poster = matchedVideo.poster || matchedVideo.thumbnail || (matchedMovie ? (matchedMovie.poster || matchedMovie.thumbnail) : poster);
+        title = matchedVideo.title || (matchedMovie ? matchedMovie.title : title);
+        urlSub = matchedVideo.urlSub || matchedVideo.subUrl || matchedVideo.subtitle || `https://sub.turboviplay.to/sub/${videoID}/${videoID}.json`;
+      } else if (matchedMovie) {
+        videoID = String(matchedMovie.id);
+        urlPlay = matchedMovie.videoUrl || matchedMovie.playUrl || urlPlay;
+        poster = matchedMovie.poster || matchedMovie.thumbnail || poster;
+        title = matchedMovie.title || title;
+        urlSub = `https://sub.turboviplay.to/sub/${videoID}/${videoID}.json`;
+      } else if (urlParam) {
+        urlPlay = urlParam;
+        videoID = 'custom';
+        urlSub = '';
+      }
+    } catch (e) {
+      console.error("Failed to resolve dynamic video information:", e);
+      if (urlParam) {
+        urlPlay = urlParam;
+        videoID = 'custom';
+        urlSub = '';
+      }
+    }
+  }
+
+  // Allow URL parameter overrides for title, poster, and logo
+  if (urlParams.get('title')) title = urlParams.get('title');
+  if (urlParams.get('poster')) poster = urlParams.get('poster');
+  if (urlParams.get('logo')) urlLogo = urlParams.get('logo');
+  if (urlParams.get('urlSub')) urlSub = urlParams.get('urlSub');
+  if (urlParams.get('subUrl')) urlSub = urlParams.get('subUrl');
+  if (urlParams.get('subtitle')) urlSub = urlParams.get('subtitle');
+
+  player = jwplayer('video_player');
+
+  const options = {
+    key: JW_KEY,
+    sources: [{ file: urlPlay, type: urlPlay.toLowerCase().includes('.mp4') ? 'mp4' : 'hls' }],
+    width: '100%',
+    height: '100%',
+    controls: false,
+    preload: true,
+    autostart: true,
+    mute: isMobile.any(),   // mobile autoplay policies require starting muted
+    image: poster,
+    title,
+    localization: { locale: 'en' },
+  };
+
+  if (title) {
+    playerTitle.textContent = title;
+    playerInfo.classList.add("show");
+  } else {
+    playerTitle.textContent = "";
+  }
+  if (urlLogo) {
+    playerLogo.src = urlLogo;
+    playerLogo.style.display = "inline-block";
+    playerInfo.classList.add("show");
+  } else {
+    playerLogo.style.display = "none";
+  }
+
+  /* ── Subtitle tracks must be attached at setup time ──────── */
+  try {
+    const response = await fetch(urlSub);
+    if (!response.ok) throw new Error('Subtitle file not found');
+    const data = await response.json();
+
+    const tracks = data.map((item) => {
+      // File names look like: /eng_1.vtt or /kor.vtt
+      const match = item.file.match(/\/([a-z]{3})(?:_(\d+))?\.vtt$/i);
+      let code = "", index = "";
+      if (match) {
+        code = languageCodes[match[1]] || match[1];
+        index = match[2] || "";
+      }
+      const label = (item.label && item.label.trim())
+        ? item.label
+        : (index ? `${code} ${index}` : code);
+      return { kind: 'captions', file: item.file, language: label, label };
+    });
+
+    if (tracks.length > 0) {
+      options.tracks = tracks;
+      options.captions = { default: true, track: 1 }; // auto-select first language
+    }
+  } catch (err) {
+    // Subtitles unavailable – play without them
+    console.warn('Subtitles not loaded:', err.message);
+  }
+
+  player.setup(options);
+  bindPlayerEvents();
+}
+
+function bindPlayerEvents() {
+  player.on("ready", onReady);
+  player.on("play", onPlay);
+  player.on("pause", onPause);
+  player.on("complete", onComplete);
+  player.on("time", onTime);
+  player.on("bufferChange", onBufferChange);
+  player.on("buffer", onBufferStart);
+  player.on("firstFrame", () => { loader.style.display = "none"; });
+  player.on("levels", onLevels);
+  player.on("levelsChanged", onLevelsChanged);
+  player.on("captionsList", onCaptionsList);
+  player.on("captionsChanged", onCaptionsChanged);
+  player.on("volume", onVolumeChange);
+  player.on("mute", onMuteChange);
+  player.on("error", onPlayerError);
+  player.on("setupError", onPlayerError);
+}
+
+function onPlayerError(e) {
+  console.error("JW Player error:", e && e.message ? e.message : e);
+}
+
+function onReady() {
+  player.setVolume(volumeVal * 100);
+  muted = player.getMute();
+  updateMuteIcon();
+  if (muted) totalVol.classList.remove("show");
+
+  // If autostart got blocked by the browser, fall back to a visible paused state
+  setTimeout(() => {
+    const state = player.getState();
+    if (state === "paused" || state === "idle") showPausedUI();
+  }, 300);
+}
+
+function showPausedUI() {
+  controls.classList.add("show-controls");
+  topControls.classList.add("show-controls");
+  mainState.classList.add("show-state");
+  handleMainStateIcon(`<ion-icon name="play-outline"></ion-icon>`);
+}
+
+function onPlay() {
+  isPlaying = true;
+  playPause.innerHTML = `<ion-icon name="pause-outline"></ion-icon>`;
+  mainState.classList.remove("show-state");
+  handleMainStateIcon(`<ion-icon name="pause-outline"></ion-icon>`);
+  loader.style.display = "none";
+}
+
+function onPause() {
+  isPlaying = false;
+  playPause.innerHTML = `<ion-icon name="play-outline"></ion-icon>`;
+  showPausedUI();
+}
+
+function onComplete() {
+  currentTime.style.width = "100%";
+  showPausedUI();
+}
+
+function onTime(e) {
+  const position = e.position || 0;
+  const dur = e.duration || 0;
+  if (dur > 0) {
+    lastKnownDuration = dur;
+    currentTime.style.width = (position / dur) * 100 + "%";
+    totalDuration.innerHTML = showDuration(dur);
+  }
+  currentDuration.innerHTML = showDuration(position);
+}
+
+function onBufferStart() {
+  loader.style.display = "unset";
+}
+
+function onBufferChange(e) {
+  buffer.style.width = (e.bufferPercent || 0) + "%";
+}
+
+/* ── Quality menu, built from JW's real HLS levels ─────────── */
+function onLevels(e) {
+  renderQualityMenu(e.levels || [], e.currentQuality);
+}
+function onLevelsChanged(e) {
+  highlightActive(qualityList, e.currentQuality);
+}
+function renderQualityMenu(levels, current) {
+  qualityList.innerHTML = "";
+  
+  const currentFile = player.getPlaylistItem() ? player.getPlaylistItem().file : '';
+  const isPlaying4K = (url4K && currentFile === url4K);
+
+  // 1. If 4K URL is available, show 4K button
+  if (url4K) {
+    const item = document.createElement("div");
+    item.className = "menu-item" + (isPlaying4K ? " quality-active" : "");
+    item.textContent = "4K";
+    item.addEventListener("click", () => {
+      if (!isPlaying4K) {
+        const currentTracks = player.getPlaylist()[0] ? player.getPlaylist()[0].tracks : [];
+        const loadOptions = [
+          {
+            sources: [{
+              file: url4K,
+              type: url4K.toLowerCase().includes('.mp4') || url4K.toLowerCase().includes('.mkv') ? 'mp4' : 'hls'
+            }],
+            image: poster,
+            tracks: currentTracks
+          }
+        ];
+        player.load(loadOptions);
+        player.play();
+        handleMainStateIcon(`<span style="font-size:1.2rem">4K</span>`);
+      }
+      settingMenu.classList.remove("show-setting-menu");
+    });
+    qualityList.appendChild(item);
+  }
+
+  // 2. If playing 4K, show HD option to switch back
+  if (isPlaying4K) {
+    const item = document.createElement("div");
+    item.className = "menu-item";
+    item.textContent = "HD (Adaptive)";
+    item.addEventListener("click", () => {
+      const currentTracks = player.getPlaylist()[0] ? player.getPlaylist()[0].tracks : [];
+      const loadOptions = [
+        {
+          sources: [{
+            file: urlPlay,
+            type: urlPlay.toLowerCase().includes('.mp4') ? 'mp4' : 'hls'
+          }],
+          image: poster,
+          tracks: currentTracks
+        }
+      ];
+      player.load(loadOptions);
+      player.play();
+      handleMainStateIcon(`<span style="font-size:1.2rem">HD</span>`);
+      settingMenu.classList.remove("show-setting-menu");
+    });
+    qualityList.appendChild(item);
+  }
+
+  // 3. Render default HLS qualities (1080p, 720p, etc.) only if not playing 4K
+  if (!isPlaying4K) {
+    levels.forEach((lvl, idx) => {
+      const item = document.createElement("div");
+      item.className = "menu-item" + (idx === current ? " quality-active" : "");
+      item.dataset.level = idx;
+      item.textContent = lvl.label || (lvl.height ? `${lvl.height}p` : `Level ${idx + 1}`);
+      item.addEventListener("click", () => {
+        player.setCurrentQuality(idx);
+        settingMenu.classList.remove("show-setting-menu");
+        handleMainStateIcon(`<span style="font-size:1.2rem">${item.textContent}</span>`);
+      });
+      qualityList.appendChild(item);
+    });
+  }
+}
+
+/* ── Subtitle menu, built from JW's real captionsList ──────── */
+function onCaptionsList(e) {
+  renderSubtitleMenu(e.tracks || [], e.track);
+}
+function onCaptionsChanged(e) {
+  highlightActive(subtitleList, e.track);
+}
+function renderSubtitleMenu(tracks, current) {
+  subtitleList.innerHTML = "";
+  tracks.forEach((t, idx) => {
+    const item = document.createElement("div");
+    item.className = "menu-item" + (idx === current ? " sub-active" : "");
+    item.dataset.index = idx;
+    item.textContent = t.label || (idx === 0 ? "Off" : `Track ${idx}`);
+    item.addEventListener("click", () => {
+      player.setCurrentCaptions(idx);
+      subtitleMenu.classList.remove("show-setting-menu");
+    });
+    subtitleList.appendChild(item);
+  });
+}
+
+function highlightActive(container, current) {
+  Array.from(container.children).forEach((el, idx) => {
+    el.classList.toggle(
+      container === qualityList ? "quality-active" : "sub-active",
+      idx === current
+    );
+  });
+}
+
+/* ── Volume / mute, mirrored from JW's own state ───────────── */
+function onVolumeChange(e) {
+  volumeVal = (e.volume || 0) / 100;
+  currentVol.style.width = volumeVal * 100 + "%";
+}
+function onMuteChange(e) {
+  muted = !!e.mute;
+  updateMuteIcon();
+  if (muted) totalVol.classList.remove("show");
+}
+function updateMuteIcon() {
+  muteUnmute.innerHTML = muted
+    ? `<ion-icon name="volume-mute-outline"></ion-icon>`
+    : `<ion-icon name="volume-high-outline"></ion-icon>`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 6 – VIEW TRACKING
+   Pings the platform after 20s, registered on the next click —
+   identical semantics to player_testing.html, but using
+   tracking-pixel pings (new Image()) instead of jQuery $.get
+   so there's no jQuery dependency and no CORS hard-fail.
+═══════════════════════════════════════════════════════════ */
+function trackView(uid, vid) {
+  const timer = setTimeout(() => {
+    let counted = false;
+    document.body.addEventListener("click", function onceClick() {
+      if (!counted) {
+        new Image().src = `https://ver02.sptvp.com/watch?videoID=${vid}&userID=${uid}`;
+        new Image().src = `https://ver03.sptvp.com/watch?videoID=${vid}&userID=${uid}`;
+        counted = true;
+        console.log("view counted");
+      }
+    });
+    clearTimeout(timer);
+  }, 20000);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 7 – CUSTOM UI WIRING
+═══════════════════════════════════════════════════════════ */
+document.addEventListener("keydown", handleShorthand);
+fullscreenBtn.addEventListener("click", toggleFullscreen);
+
+document.getElementById("speedControl").addEventListener("click", (e) => {
+  e.stopPropagation();
+  closeMenus(settingMenu);
+  settingMenu.classList.toggle("show-setting-menu");
+  const speedSection = document.querySelector('.setting-menu .menu-item[data-value]');
+  if (speedSection) speedSection.scrollIntoView({ block: "nearest" });
+});
+
+document.getElementById("lockControl").addEventListener("click", handleLockScreen);
+
+audioSubControl.addEventListener("click", (e) => {
+  e.stopPropagation();
+  closeMenus(subtitleMenu);
+  subtitleMenu.classList.toggle("show-setting-menu");
+});
+
+document.addEventListener("click", (e) => {
+  if (!e.composedPath().includes(settingsBtn) && !e.composedPath().includes(settingMenu)) {
+    settingMenu.classList.remove("show-setting-menu");
+  }
+  if (!e.composedPath().includes(audioSubControl)) {
+    subtitleMenu.classList.remove("show-setting-menu");
+  }
+});
+
+function closeMenus(except) {
+  [settingMenu, subtitleMenu].forEach((m) => {
+    if (m !== except) m.classList.remove("show-setting-menu");
+  });
+}
+
+playPause.addEventListener("click", () => {
+  if (!isPlaying) player.play(); else player.pause();
+});
+
+duration.addEventListener("click", navigate);
+
+duration.addEventListener("mousedown", (e) => {
+  mouseDownProgress = true;
+  navigate(e);
+});
+
+totalVol.addEventListener("mousedown", (e) => {
+  mouseDownVol = true;
+  handleVolume(e);
+});
+
+document.addEventListener("mouseup", () => {
+  mouseDownProgress = false;
+  mouseDownVol = false;
+});
+
+document.addEventListener("mousemove", handleMousemove);
+
+duration.addEventListener("mouseenter", () => { mouseOverDuration = true; });
+
+duration.addEventListener("mouseleave", () => {
+  mouseOverDuration = false;
+  hoverTime.style.width = 0;
+  hoverDuration.innerHTML = "";
+});
+
+videoContainer.addEventListener("click", toggleMainState);
+videoContainer.addEventListener("fullscreenchange", () => {
+  videoContainer.classList.toggle("fullscreen", document.fullscreenElement);
+});
+
+videoContainer.addEventListener("mouseleave", hideControls);
+
+videoContainer.addEventListener("mousemove", () => {
+  controls.classList.add("show-controls");
+  topControls.classList.add("show-controls");
+  hideControls();
+});
+
+videoContainer.addEventListener("touchstart", (e) => {
+  controls.classList.add("show-controls");
+  topControls.classList.add("show-controls");
+  touchClientX = e.changedTouches[0].clientX;
+  const currentTimeRect = currentTime.getBoundingClientRect();
+  touchPastDurationWidth = currentTimeRect.width;
+  touchStartTime = e.timeStamp;
+});
+
+videoContainer.addEventListener("touchend", () => {
+  hideControls();
+  touchClientX = 0;
+  touchPastDurationWidth = 0;
+  touchStartTime = 0;
+});
+
+videoContainer.addEventListener("touchmove", handleTouchNavigate);
+
+controls.addEventListener("mouseenter", () => {
+  controls.classList.add("show-controls");
+  topControls.classList.add("show-controls");
+  isCursorOnControls = true;
+});
+controls.addEventListener("mouseleave", () => { isCursorOnControls = false; });
+
+topControls.addEventListener("mouseenter", () => {
+  controls.classList.add("show-controls");
+  topControls.classList.add("show-controls");
+  isCursorOnControls = true;
+});
+topControls.addEventListener("mouseleave", () => { isCursorOnControls = false; });
+
+mainState.addEventListener("click", toggleMainState);
+mainState.addEventListener("animationend", handleMainSateAnimationEnd);
+
+muteUnmute.addEventListener("click", toggleMuteUnmute);
+
+muteUnmute.addEventListener("mouseenter", () => {
+  if (!muted) totalVol.classList.add("show");
+  else totalVol.classList.remove("show");
+});
+
+muteUnmute.addEventListener("mouseleave", (e) => {
+  if (e.relatedTarget != volume) totalVol.classList.remove("show");
+});
+
+forward.addEventListener("click", handleForward);
+forwardSate.addEventListener("animationend", () => {
+  forwardSate.classList.remove("show-state");
+  forwardSate.classList.remove("animate-state");
+});
+
+backward.addEventListener("click", handleBackward);
+backwardSate.addEventListener("animationend", () => {
+  backwardSate.classList.remove("show-state");
+  backwardSate.classList.remove("animate-state");
+});
+
+settingsBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  closeMenus(settingMenu);
+  settingMenu.classList.toggle("show-setting-menu");
+});
+
+speedButtons.forEach((btn) => btn.addEventListener("click", handlePlaybackRate));
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 8 – CONTROL LOGIC (all routed through JW's API)
+═══════════════════════════════════════════════════════════ */
+function showDuration(time) {
+  if (!isFinite(time) || isNaN(time)) return "0:00";
+  const hours = Math.floor(time / 60 ** 2);
+  const min = Math.floor((time / 60) % 60);
+  const sec = Math.floor(time % 60);
+  if (hours > 0) return `${formatter(hours)}:${formatter(min)}:${formatter(sec)}`;
+  return `${formatter(min)}:${formatter(sec)}`;
+}
+
+function formatter(number) {
+  return new Intl.NumberFormat({}, { minimumIntegerDigits: 2 }).format(number);
+}
+
+function navigate(e) {
+  const totalDurationRect = duration.getBoundingClientRect();
+  const width = Math.min(Math.max(0, e.clientX - totalDurationRect.x), totalDurationRect.width);
+  const fraction = width / totalDurationRect.width;
+  currentTime.style.width = fraction * 100 + "%";
+  if (lastKnownDuration > 0) player.seek(fraction * lastKnownDuration);
+}
+
+function handleTouchNavigate(e) {
+  hideControls();
+  if (e.timeStamp - touchStartTime > 500) {
+    const durationRect = duration.getBoundingClientRect();
+    const clientX = e.changedTouches[0].clientX;
+    const value = Math.min(
+      Math.max(0, touchPastDurationWidth + (clientX - touchClientX) * 0.2),
+      durationRect.width
+    );
+    currentTime.style.width = value + "px";
+    if (lastKnownDuration > 0) {
+      const fraction = value / durationRect.width;
+      player.seek(fraction * lastKnownDuration);
+      currentDuration.innerHTML = showDuration(fraction * lastKnownDuration);
+    }
+  }
+}
+
+function toggleMuteUnmute() {
+  const newMuted = !player.getMute();
+  player.setMute(newMuted);
+  handleMainStateIcon(newMuted
+    ? `<ion-icon name="volume-mute-outline"></ion-icon>`
+    : `<ion-icon name="volume-high-outline"></ion-icon>`);
+}
+
+function hideControls() {
+  if (timeout) clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    if (isPlaying && !isCursorOnControls) {
+      controls.classList.remove("show-controls");
+      topControls.classList.remove("show-controls");
+      settingMenu.classList.remove("show-setting-menu");
+      subtitleMenu.classList.remove("show-setting-menu");
+    }
+  }, 1000);
+}
+
+function toggleMainState(e) {
+  e.stopPropagation();
+  if (!e.composedPath().includes(controls) && !e.composedPath().includes(topControls)) {
+    if (!isPlaying) player.play(); else player.pause();
+  }
+}
+
+function handleVolume(e) {
+  const totalVolRect = totalVol.getBoundingClientRect();
+  const width = Math.min(Math.max(0, e.clientX - totalVolRect.x), totalVolRect.width);
+  currentVol.style.width = width + "px";
+  volumeVal = Math.min(Math.max(0, width / totalVolRect.width), 1);
+  player.setVolume(volumeVal * 100);
+  player.setMute(volumeVal === 0);
+}
+
+/* Browser-native fullscreen on the WHOLE container — not JW's own
+   setFullscreen(), which only covers #video_player and would leave
+   the custom top/bottom control bars outside the fullscreen view. */
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    videoContainer.requestFullscreen();
+    handleMainStateIcon(`<ion-icon name="scan-outline"></ion-icon>`);
+  } else {
+    handleMainStateIcon(`<ion-icon name="contract-outline"></ion-icon>`);
+    document.exitFullscreen();
+  }
+}
+
+function handleMousemove(e) {
+  if (mouseDownProgress) { e.preventDefault(); navigate(e); }
+  if (mouseDownVol) handleVolume(e);
+  if (mouseOverDuration && lastKnownDuration > 0) {
+    const rect = duration.getBoundingClientRect();
+    const width = Math.min(Math.max(0, e.clientX - rect.x), rect.width);
+    const percent = (width / rect.width) * 100;
+    hoverTime.style.width = width + "px";
+    hoverDuration.innerHTML = showDuration((lastKnownDuration / 100) * percent);
+  }
+}
+
+function handleForward() {
+  forwardSate.classList.add("show-state");
+  forwardSate.classList.add("animate-state");
+  player.seek(player.getPosition() + 10);
+}
+
+function handleBackward() {
+  backwardSate.classList.add("show-state");
+  backwardSate.classList.add("animate-state");
+  player.seek(Math.max(0, player.getPosition() - 10));
+}
+
+function handleMainStateIcon(icon) {
+  mainState.classList.add("animate-state");
+  mainState.innerHTML = icon;
+}
+
+function handleMainSateAnimationEnd() {
+  mainState.classList.remove("animate-state");
+  if (!isPlaying) mainState.innerHTML = `<ion-icon name="play-outline"></ion-icon>`;
+  if (document.pictureInPictureElement) mainState.innerHTML = `<ion-icon name="tv-outline"></ion-icon>`;
+}
+
+function handlePlaybackRate(e) {
+  const rate = parseFloat(e.currentTarget.dataset.value);
+  player.setPlaybackRate(rate);
+  speedButtons.forEach((btn) => btn.classList.remove("speed-active"));
+  e.currentTarget.classList.add("speed-active");
+  settingMenu.classList.remove("show-setting-menu");
+  currentSpeedDisplay.textContent = rate + "x";
+  handleMainStateIcon(`<span style="font-size: 1.4rem">${rate}x</span>`);
+}
+
+function handlePlaybackRateKey(type = "") {
+  let rate = player.getPlaybackRate();
+  if (type === "increase" && rate < 2) rate += 0.25;
+  else if (rate > 0.25 && type !== "increase") rate -= 0.25;
+  rate = Math.round(rate * 100) / 100;
+  player.setPlaybackRate(rate);
+  handleMainStateIcon(`<span style="font-size: 1.4rem">${rate}x</span>`);
+  currentSpeedDisplay.textContent = rate + "x";
+  speedButtons.forEach((btn) => {
+    btn.classList.remove("speed-active");
+    if (parseFloat(btn.dataset.value) === rate) btn.classList.add("speed-active");
+  });
+}
+
+function handleShorthand(e) {
+  const tagName = document.activeElement.tagName.toLowerCase();
+  if (tagName === "input") return;
+  if (e.key.match(/[0-9]/gi) && lastKnownDuration > 0) {
+    const pct = parseInt(e.key) * 10;
+    player.seek((lastKnownDuration / 100) * pct);
+    currentTime.style.width = pct + "%";
+  }
+  switch (e.key.toLowerCase()) {
+    case " ":
+      if (tagName === "button") return;
+      if (isPlaying) player.pause(); else player.play();
+      break;
+    case "f": toggleFullscreen(); break;
+    case "arrowright": handleForward(); break;
+    case "arrowleft": handleBackward(); break;
+    case "m": toggleMuteUnmute(); break;
+    case "+": handlePlaybackRateKey("increase"); break;
+    case "-": handlePlaybackRateKey(); break;
+    default: break;
+  }
+}
+
+function handleLockScreen() {
+  isLocked = !isLocked;
+  const lockIcon = document.querySelector("#lockControl ion-icon");
+  const lockText = document.querySelector("#lockControl span");
+
+  if (isLocked) {
+    lockIcon.setAttribute("name", "lock-closed");
+    lockText.textContent = "Unlock";
+    controls.style.pointerEvents = "none";
+    topControls.style.pointerEvents = "auto";
+    videoContainer.style.pointerEvents = "none";
+    handleMainStateIcon(`<ion-icon name="lock-closed-outline"></ion-icon>`);
+  } else {
+    lockIcon.setAttribute("name", "lock-open-outline");
+    lockText.textContent = "Lock";
+    controls.style.pointerEvents = "auto";
+    topControls.style.pointerEvents = "auto";
+    videoContainer.style.pointerEvents = "auto";
+    handleMainStateIcon(`<ion-icon name="lock-open-outline"></ion-icon>`);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION 9 – ENTRY POINT
+═══════════════════════════════════════════════════════════ */
+document.addEventListener("DOMContentLoaded", () => {
+  setupPlayer();
+  trackView(userID, videoID);
+});
+</script>
+
+<script>
+/*!-----------------------------------------------------------------------------
+ * SiteGuard - Version 1.1.2
+ * License: MIT
+ * Repository: https://github.com/luizbizzio/siteguard
+ * Published: 2024-11-08
+ * -------------------------------------------------------------------------- */
+function af(){var e=!1;setInterval(function(){var t=performance.now();console.profile(),console.profileEnd(),console.clear&&console.clear(),10<performance.now()-t&&!e&&(e=!0,document.documentElement.innerHTML="",location.reload())},1)}af(),document.addEventListener("dragstart",e=>e.preventDefault()),document.addEventListener("auxclick",e=>{1===e.button&&(e.stopPropagation(),e.preventDefault())}),document.addEventListener("contextmenu",function(e){e.preventDefault()}),document.onkeydown=e=>{[{ctrl:!0,shift:!0,code:"KeyI"},{ctrl:!0,shift:!0,code:"KeyJ"},{ctrl:!0,shift:!0,code:"KeyV"},{ctrl:!0,shift:!0,code:"KeyC"},{ctrl:!0,code:"KeyU"},{ctrl:!0,code:"KeyP"},{ctrl:!0,code:"KeyS"},{ctrl:!0,code:"KeyJ"},{ctrl:!0,code:"KeyF"},{code:"F12"}].some(t=>!!t.ctrl===e.ctrlKey&&!!t.shift===e.shiftKey&&e.code===t.code)&&e.preventDefault()},document.addEventListener("DOMContentLoaded",function(){document.body.style.setProperty("user-select","none","important");let e=document.createElement("style");e.type="text/css",e.media="print",e.innerHTML="* { display: none !important; }",document.head.appendChild(e);let t=document.createElement("style");t.type="text/css",t.innerHTML="body {-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}",document.head.appendChild(t)});
+</script>
+</body>
+</html>
