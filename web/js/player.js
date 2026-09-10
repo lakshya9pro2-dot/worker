@@ -17,6 +17,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await res.json();
             if (data.success && data.session && data.session.result && data.session.result.url) {
                 playUrl = data.session.result.url;
+                
+                // Initialize WatchProgress
+                if (data.session.meta && window.WatchProgress) {
+                    const meta = data.session.meta;
+                    window.watchProgress = new WatchProgress({
+                        videoId: meta.id,
+                        mediaType: meta.type || 'movies',
+                        seasonNumber: meta.season,
+                        episodeNumber: meta.episode,
+                        getCurrentTime: () => videoElem.currentTime,
+                        getDuration: () => videoElem.duration,
+                        seekTo: (time) => { videoElem.currentTime = time; }
+                    });
+                    
+                    videoElem.addEventListener('timeupdate', () => window.watchProgress.saveProgress());
+                    videoElem.addEventListener('pause', () => window.watchProgress.saveProgress(true));
+                }
             } else {
                 showError("Session expired or invalid playback data.");
                 return;

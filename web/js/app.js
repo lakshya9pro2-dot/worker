@@ -47,7 +47,10 @@ const app = {
         const content = document.getElementById('content');
         if (data.success && data.play) {
             // Found directly, redirect to player2
-            window.location.href = `/player2.html?ttid=${data.play}&id=${data.id}`;
+            let qs = `?ttid=${data.play}&id=${data.id}&type=${data.type || ''}`;
+            if (data.season) qs += `&s=${data.season}`;
+            if (data.episode) qs += `&e=${data.episode}`;
+            window.location.href = `/player2.html${qs}`;
         } else if (data.resolverRequired && data.requestId) {
             // Not found, go to getting.html with requestId
             window.location.href = `/getting.html?requestId=${data.requestId}`;

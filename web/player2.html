@@ -637,6 +637,7 @@ body {
     </div>
   </div>
 
+<script src="/js/progress.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════
    SECTION 1 – MOBILE DETECTION (ported from player_testing.html)
@@ -1150,6 +1151,8 @@ async function setupPlayer() {
   bindPlayerEvents();
 }
 
+let watchProgress = null;
+
 function bindPlayerEvents() {
   player.on("ready", onReady);
   player.on("play", onPlay);
@@ -1167,7 +1170,23 @@ function bindPlayerEvents() {
   player.on("mute", onMuteChange);
   player.on("error", onPlayerError);
   player.on("setupError", onPlayerError);
+
+  // Initialize WatchProgress
+  const urlParams = new URLSearchParams(window.location.search);
+  const videoId = urlParams.get('id') || videoID;
+  if (videoId) {
+    watchProgress = new WatchProgress({
+      videoId: videoId,
+      mediaType: urlParams.get('type') || 'movies',
+      seasonNumber: urlParams.get('s'),
+      episodeNumber: urlParams.get('e'),
+      getCurrentTime: () => player.getPosition(),
+      getDuration: () => player.getDuration(),
+      seekTo: (time) => player.seek(time)
+    });
+  }
 }
+
 
 function onPlayerError(e) {
   console.error("JW Player error:", e && e.message ? e.message : e);
@@ -1205,6 +1224,7 @@ function onPause() {
   isPlaying = false;
   playPause.innerHTML = `<ion-icon name="play-outline"></ion-icon>`;
   showPausedUI();
+  if (watchProgress) watchProgress.saveProgress(true);
 }
 
 function onComplete() {
@@ -1221,6 +1241,7 @@ function onTime(e) {
     totalDuration.innerHTML = showDuration(dur);
   }
   currentDuration.innerHTML = showDuration(position);
+  if (watchProgress) watchProgress.saveProgress();
 }
 
 function onBufferStart() {
