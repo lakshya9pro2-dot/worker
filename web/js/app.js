@@ -47,7 +47,7 @@ const app = {
         const content = document.getElementById('content');
         if (data.success && data.play) {
             // Found directly, redirect to player2
-            window.location.href = `/player2.html?ttid=${data.id}&playId=${data.play}`;
+            window.location.href = `/player2.html?ttid=${data.play}&id=${data.id}`;
         } else if (data.resolverRequired && data.requestId) {
             // Not found, go to getting.html with requestId
             window.location.href = `/getting.html?requestId=${data.requestId}`;
