@@ -1,4 +1,4 @@
-const API_BASE = "https://kineflex-api.workers.dev"; // Update with actual deployed worker URL if testing on Pages, or relative if same origin
+const API_BASE = "https://worker.kineflex-netflex.workers.dev"; // Update with actual deployed worker URL if testing on Pages, or relative if same origin
 // We use relative for now so it works when deployed together, or absolute if needed.
 const API = "/api/resolve"; 
 
