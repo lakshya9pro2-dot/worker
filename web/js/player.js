@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (id) {
             return {
                 success: true,
-                url: `${API_BASE}/api/proxy?url=${encodeURIComponent('https://moon.peakstorm.top/vd/dummy/master.m3u8')}`,
+                url: 'https://moon.peakstorm.top/vd/dummy/master.m3u8',
                 type: 'hls'
             };
         }
