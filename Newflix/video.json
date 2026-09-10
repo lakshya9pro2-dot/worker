@@ -1,0 +1,375 @@
+[
+  {
+    "id": 1653208,
+    "title": " The Great Grand Superhero ",
+    "play": "6a44849891982",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+
+  {
+    "id": 1628448,
+    "title": "TV Show",
+    "type": "tv",
+    "quality": "HD",
+    
+    "seasons": [
+      {
+        "season": 1,
+        "episodes": [
+          {
+            "episode": 1,
+            "play": "6a4484269c62c"
+          },
+          {
+            "episode": 2,
+            "play": "6a4484269c62d"
+          }
+        ]
+      }
+    ]
+  },
+    {
+    "id": 262838,
+    "title": "India's Got Latent",
+    "type": "tv",
+    "quality": "HD",
+    "seasons": [
+      {
+        "season": 2,
+        "episodes": [
+          {
+            "episode": 1,
+            "play": "6a7ab9dfb2beb"
+          },
+          {
+            "episode": 2,
+            "play": "6a7abad05ad69"
+          },
+          {
+            "episode": 3,
+            "play": "6a7abbe6a5fe7"
+          },
+          {
+            "episode": 4,
+            "play": "6a7abd56b6cf5"
+          },
+          {
+            "episode": 5,
+            "play": "6a7b3b329e001"
+          },
+          {
+            "episode": 6,
+            "play": "6a3633974f08d"
+          },
+                    {
+            "episode": 7,
+            "play": "6a3633974f08d"
+          },
+                    {
+            "episode": 8,
+            "play": "6a3633974f08d"
+          }
+          
+        ]
+      }
+    ]
+  },
+  {
+    "id": 784963,
+    "title": "Tuck Jagadish",
+    "type": "movie",
+    "year": "2021",
+    "thumbnail": "https://image.tmdb.org/t/p/w400/dwRfi1cV9oKjVEll12DJqjLWyOD.jpg",
+    "quality": "HD"
+  },
+  {
+    "id": 1167307,
+    "title": "Obsession",
+    "play": "6a4482e9ae150",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1167307,
+    "title": "David",
+    "play": "6a44824dcd175",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1241674,
+    "title": "The Last Breath",
+    "play": "6a41e8afcd24a",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1720282,
+    "title": "WWE Night of Champions",
+    "play": "6a41e83b61b74",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1398050,
+    "title": "Driver's Ed",
+    "play": "6a3f9ccb1f2ab",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1081003,
+    "title": "Supergirl",
+    "play": "6a3f9c66efa75",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1397385,
+    "title": "Little Brother",
+    "play": "6a3f9bdf9fc79",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1169516,
+    "title": "Welcome to the Jungle",
+    "play": "6a3df32b49d19",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1247165,
+    "title": "Raja Shivaji",
+    "play": "6a3df2b83ebe3",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1410937,
+    "title": "Balan - The Boy",
+    "play": "6a3df2217b1b9",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1377650,
+    "title": "Boonie Bears: Future Reborn",
+    "play": "6a3df1a36464b",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 393423,
+    "title": "Laal Rang",
+    "play": "6a3cb1a0bf549",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 687163,
+    "title": "Project Hail Mary",
+    "play": "6a3cade6e5f9f",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 782054,
+    "title": "Doraemon the Movie: Nobita's Little Star Wars",
+    "play": "6a3cad26be09d",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1515729,
+    "title": "Blast",
+    "play": "6a3cacb054318",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1020047,
+    "title": "In the Hand of Dante",
+    "play": "6a3cac3f28506",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 454639,
+    "title": "Masters of the Universe",
+    "play": "6a3cabb491823",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1301421,
+    "title": "The Sheep Detectives",
+    "play": "6a3cab472d9f8",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1499984,
+    "title": "Gladiator Underground",
+    "play": "6a3caa9fe3cd3",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 83533,
+    "title": "Avatar Fire and Ash",
+    "play": "6a3caa4f398be",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1390300,
+    "title": "Over Your Dead Body",
+    "play": "6a378c3436228",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1597280,
+    "title": "Kenatha Kanom",
+    "play": "6a3789ffe7e1b",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1696236,
+    "title": "Mareechika",
+    "play": "6a378937a957a",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1309587,
+    "title": "Hell in Paradise",
+    "play": "6a3788ca2856d",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 931285,
+    "title": "Mortal Kombat II",
+    "play": "6a37858d01385",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1507097,
+    "title": "Sattendru Maarudhu Vaanilai",
+    "play": "6a3786839cbd9",
+    
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1477317,
+    "title": "Your Fault: London ",
+    "play": "6a37765e3ac66",
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1392469,
+    "title": "Cocktail 2",
+    "play": "6a3775641d63d",
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1228564,
+    "title": "Boonie.Bears.Time.Twist ",
+    "play": "6a3772e7adc65",
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 936075,
+    "title": "Michael ",
+    "play": "6a37725932a49",
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1451344,
+    "title": "Husbands.in.Action",
+    "play": "6a366c17dedb8",
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 614945,
+    "title": "Voicemails for Isabelle",
+    "play": "6a36289664d0e",
+    "quality": "HD"
+  },
+  {
+    "id": 1084244,
+    "title": "Toy Story 5 ",
+    "play": "6a36275a36302",
+    "quality": "HD"
+  },
+  {
+    "id": 1446056,
+    "title": "Junior",
+    "play": "6a36265fee5d4",
+    "quality": "HD"
+  },
+  {
+    "id": 597219,
+    "title": "The Half of It",
+    "4k": "https://cdn.vids.st/video91446/kenatha-kanom-2026-4k-2160p-sdr-jiohs-web-dl-multi-ddpa5-1-hevc-x265-hdhub4u-ms.mkv",
+    "play": "6a34aed8496a7",
+    "type": "movie",
+    "quality": [
+      "HD",
+      "4K"
+    ]
+  },
+  {
+    "id": 1242898,
+    "title": "Predator Badlands",
+    "play": "6a34ad97ce6ac",
+    "type": "movie",
+    "quality": "HD"
+  },
+  {
+    "id": 1582770,
+    "title": "Dhurandhar The Revenge",
+    "year": "2026",
+    "play": "6a34af2981af8",
+    "type": "movie",
+    "quality": "HD"
+  }
+
+]
