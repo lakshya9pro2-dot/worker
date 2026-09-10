@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let playUrl = null;
 
     // IMPORTANT: Replace this with your actual Cloudflare Worker URL
-    const API_BASE = "https://kineflex-api.workers.dev";
+    const API_BASE = "https://worker.kineflex-netflex.workers.dev";
 
     if (requestId) {
         // Fetch from session

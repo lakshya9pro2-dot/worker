@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     statusMsg.innerText = "Waiting for resolver...";
 
     // IMPORTANT: Replace this with your actual Cloudflare Worker URL
-    const API_BASE = "https://kineflex-api.workers.dev";
+    const API_BASE = "https://worker.kineflex-netflex.workers.dev";
     
     // 2. Start polling the backend for session completion
     let attempts = 0;
