@@ -1,0 +1,40 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        { "header": "Origin", "operation": "set", "value": "https://vidfast.vc" },
+        { "header": "Referer", "operation": "set", "value": "https://vidfast.vc/" },
+        { "header": "User-Agent", "operation": "set", "value": "Mozilla/5.0 (X11; Linux x86_64; rv:151.0) Gecko/20100101 Firefox/151.0" }
+      ],
+      "responseHeaders": [
+        { "header": "Access-Control-Allow-Origin", "operation": "set", "value": "*" }
+      ]
+    },
+    "condition": {
+      "urlFilter": "*://*peakstorm.top/*",
+      "resourceTypes": ["xmlhttprequest", "media", "sub_frame"]
+    }
+  },
+  {
+    "id": 2,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        { "header": "Origin", "operation": "set", "value": "https://vidfast.vc" },
+        { "header": "Referer", "operation": "set", "value": "https://vidfast.vc/" },
+        { "header": "User-Agent", "operation": "set", "value": "Mozilla/5.0 (X11; Linux x86_64; rv:151.0) Gecko/20100101 Firefox/151.0" }
+      ],
+      "responseHeaders": [
+        { "header": "Access-Control-Allow-Origin", "operation": "set", "value": "*" }
+      ]
+    },
+    "condition": {
+      "urlFilter": "*://*keenanchor.top/*",
+      "resourceTypes": ["xmlhttprequest", "media", "sub_frame"]
+    }
+  }
+]

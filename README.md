@@ -21,11 +21,19 @@ Deploy the contents of the `web/` folder to Cloudflare Pages, Netlify, or GitHub
 - Cloudflare Pages: Create a new Pages project and link to your repository. Ensure `_redirects` is supported (Pages uses `_redirects`).
 - Netlify: Create a new site from folder `web/`.
 
-### Extension
+### Extension (Chrome / Edge)
 1. Open Chrome and go to `chrome://extensions/`.
 2. Enable "Developer mode".
 3. Click "Load unpacked".
 4. Select the `extension/` directory.
+
+### Extension (Firefox)
+1. Navigate to the `extension/` directory.
+2. Delete the existing `manifest.json`.
+3. Rename `manifest-firefox.json` to `manifest.json`.
+4. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
+5. Click "Load Temporary Add-on..." and select the `manifest.json` file.
+6. **Important for Firefox**: Ensure you grant the extension permissions when prompted, or right-click the extension icon and select "Always allow on this site" if needed.
 
 ## Testing
 

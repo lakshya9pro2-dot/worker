@@ -5,7 +5,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const requestId = message.requestId;
         
         // Fetch the session to know what to resolve
-        const API = "https://kineflex-api.workers.dev"; // Should match deployed worker
+        const API = "https://worker.kineflex-netflex.workers.dev"; // Should match deployed worker
         
         fetch(`${API}/api/session/${requestId}`)
             .then(res => res.json())
@@ -24,8 +24,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                         return sendError(requestId, API, "Unknown media type");
                     }
                     
-                    // Start observation
-                    startResolution(requestId, targetUrl, API);
+                    // Start observation using the tab that sent the message
+                    if (sender.tab && sender.tab.id) {
+                        startResolution(requestId, sender.tab.id, API);
+                    } else {
+                        sendError(requestId, API, "Could not determine tab ID");
+                    }
                     
                     sendResponse({ type: 'KINEFLEX_RESOLVE_RESULT', requestId, success: true, status: "started" });
                 } else {
@@ -40,51 +44,44 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
-function startResolution(requestId, targetUrl, API) {
-    chrome.tabs.create({ url: targetUrl, active: false }, (tab) => {
-        const tabId = tab.id;
-        
-        const listener = (details) => {
-            if (details.tabId === tabId && details.url.includes('master.m3u8')) {
-                // Found the playback URL!
-                const playUrl = details.url;
-                
-                // Cleanup
-                chrome.webRequest.onBeforeRequest.removeListener(listener);
-                chrome.tabs.remove(tabId);
-                
-                // Send result back to worker
-                sendResult(requestId, API, playUrl);
-            }
-        };
-        
-        // Listen for the m3u8 request
-        chrome.webRequest.onBeforeRequest.addListener(
-            listener,
-            { urls: ["*://*.peakstorm.top/*"], tabId: tabId }
-        );
-        
-        // Timeout after 30 seconds
-        setTimeout(() => {
-            if (chrome.webRequest.onBeforeRequest.hasListener(listener)) {
-                chrome.webRequest.onBeforeRequest.removeListener(listener);
-                chrome.tabs.remove(tabId).catch(()=>{});
-                sendError(requestId, API, "Timeout waiting for video source");
-            }
-        }, 30000);
-    });
+function startResolution(requestId, tabId, API) {
+    const listener = (details) => {
+        if (details.tabId === tabId && details.url.includes('master.m3u8')) {
+            // Found the playback URL!
+            const playUrl = details.url;
+            
+            // Cleanup
+            chrome.webRequest.onBeforeRequest.removeListener(listener);
+            
+            // Send result back to worker
+            sendResult(requestId, API, playUrl);
+        }
+    };
+    
+    // Listen for the m3u8 request
+    chrome.webRequest.onBeforeRequest.addListener(
+        listener,
+        { urls: ["*://*.peakstorm.top/*", "*://*.keenanchor.top/*"], tabId: tabId }
+    );
+    
+    // Timeout after 30 seconds
+    setTimeout(() => {
+        if (chrome.webRequest.onBeforeRequest.hasListener(listener)) {
+            chrome.webRequest.onBeforeRequest.removeListener(listener);
+            sendError(requestId, API, "Timeout waiting for video source");
+        }
+    }, 30000);
 }
 
 function sendResult(requestId, API, playUrl) {
-    // We proxy it through our worker to handle CORS and Referer headers
-    const proxiedUrl = `${API}/api/proxy?url=${encodeURIComponent(playUrl)}`;
-    
+    // We send the raw URL because the extension's declarativeNetRequest rules
+    // will automatically handle the Origin/Referer headers in the browser!
     fetch(`${API}/api/session/${requestId}/result`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             success: true,
-            url: proxiedUrl,
+            url: playUrl,
             type: 'hls'
         })
     }).catch(console.error);
