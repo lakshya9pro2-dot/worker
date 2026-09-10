@@ -1,6 +1,6 @@
-const API_BASE = "https://worker.kineflex-netflex.workers.dev"; // Update with actual deployed worker URL if testing on Pages, or relative if same origin
-// We use relative for now so it works when deployed together, or absolute if needed.
-const API = "/api/resolve"; 
+// IMPORTANT: Replace this with your actual Cloudflare Worker URL
+const API_BASE = "https://worker.kineflex-netflex.workers.dev"; 
+const API = `${API_BASE}/api/resolve`; 
 
 const app = {
     async resolveMedia(urlPath) {

@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     statusMsg.innerText = "Waiting for resolver...";
 
+    // IMPORTANT: Replace this with your actual Cloudflare Worker URL
+    const API_BASE = "https://kineflex-api.workers.dev";
+    
     // 2. Start polling the backend for session completion
     let attempts = 0;
     const maxAttempts = 30; // ~ 1 minute
@@ -28,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pollInterval = setInterval(async () => {
         attempts++;
         try {
-            const res = await fetch(`/api/session/${requestId}`);
+            const res = await fetch(`${API_BASE}/api/session/${requestId}`);
             const data = await res.json();
             
             if (data.success && data.session && data.session.status === 'completed') {

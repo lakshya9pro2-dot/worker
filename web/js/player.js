@@ -7,10 +7,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     let playUrl = null;
 
+    // IMPORTANT: Replace this with your actual Cloudflare Worker URL
+    const API_BASE = "https://kineflex-api.workers.dev";
+
     if (requestId) {
         // Fetch from session
         try {
-            const res = await fetch(`/api/session/${requestId}`);
+            const res = await fetch(`${API_BASE}/api/session/${requestId}`);
             const data = await res.json();
             if (data.success && data.session && data.session.result && data.session.result.url) {
                 playUrl = data.session.result.url;
@@ -83,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (id) {
             return {
                 success: true,
-                url: `/api/proxy?url=${encodeURIComponent('https://moon.peakstorm.top/vd/dummy/master.m3u8')}`,
+                url: `${API_BASE}/api/proxy?url=${encodeURIComponent('https://moon.peakstorm.top/vd/dummy/master.m3u8')}`,
                 type: 'hls'
             };
         }
