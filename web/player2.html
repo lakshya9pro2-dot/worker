@@ -555,6 +555,9 @@ body {
           <div class="subtitle-list" id="subtitleList"></div>
         </ul>
       </div>
+      <!-- Shows whether progress is being synced to the account, or a
+           sign-in link if not (populated by /js/auth.js) -->
+      <div class="top-control-item" id="accountStatus" style="cursor:default;"></div>
     </div>
 
     <!-- JW Player mounts here -->
@@ -637,6 +640,8 @@ body {
     </div>
   </div>
 
+<script src="/js/config.js"></script>
+<script src="/js/auth.js"></script>
 <script src="/js/progress.js"></script>
 <script>
 /* ═══════════════════════════════════════════════════════════
@@ -1751,6 +1756,7 @@ function handleLockScreen() {
 document.addEventListener("DOMContentLoaded", () => {
   setupPlayer();
   trackView(userID, videoID);
+  if (window.KineflexAuth) KineflexAuth.mountAccountWidget('accountStatus');
 });
 </script>
 
