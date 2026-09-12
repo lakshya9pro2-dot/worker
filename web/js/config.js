@@ -13,3 +13,5 @@
 // services either after the render.yaml "name" field or after
 // the GitHub repo, and the two can differ.
 window.WATCH_API_BASE = "https://testing-for-api.onrender.com";
+window.MAIN_SITE_BASE = "https://jade-genie-927c3c.netlify.app";
+window.PLAYER_SITE_BASE = "https://testingplaty.netlify.app";
