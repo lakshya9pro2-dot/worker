@@ -1165,9 +1165,10 @@ function bindPlayerEvents() {
   player.on("complete", onComplete);
   player.on("time", onTime);
   player.on("bufferChange", onBufferChange);
-  player.on("buffer", onBufferStart);
-  player.on("firstFrame", () => { loader.style.display = "none"; });
-  player.on("levels", onLevels);
+  player.on("firstFrame", () => {
+    loader.style.display = "none";
+    if (watchProgress) watchProgress.attemptResume();
+  });
   player.on("levelsChanged", onLevelsChanged);
   player.on("captionsList", onCaptionsList);
   player.on("captionsChanged", onCaptionsChanged);
@@ -1203,6 +1204,8 @@ function onReady() {
   updateMuteIcon();
   if (muted) totalVol.classList.remove("show");
 
+  if (watchProgress) watchProgress.attemptResume();
+
   // If autostart got blocked by the browser, fall back to a visible paused state
   setTimeout(() => {
     const state = player.getState();
@@ -1223,6 +1226,7 @@ function onPlay() {
   mainState.classList.remove("show-state");
   handleMainStateIcon(`<ion-icon name="pause-outline"></ion-icon>`);
   loader.style.display = "none";
+  if (watchProgress) watchProgress.attemptResume();
 }
 
 function onPause() {
@@ -1246,7 +1250,10 @@ function onTime(e) {
     totalDuration.innerHTML = showDuration(dur);
   }
   currentDuration.innerHTML = showDuration(position);
-  if (watchProgress) watchProgress.saveProgress();
+  if (watchProgress) {
+    watchProgress.attemptResume();
+    watchProgress.saveProgress();
+  }
 }
 
 function onBufferStart() {
@@ -1753,10 +1760,13 @@ function handleLockScreen() {
 /* ═══════════════════════════════════════════════════════════
    SECTION 9 – ENTRY POINT
 ═══════════════════════════════════════════════════════════ */
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  if (window.KineflexAuth) {
+    await window.KineflexAuth.init();
+    KineflexAuth.mountAccountWidget('accountStatus');
+  }
   setupPlayer();
   trackView(userID, videoID);
-  if (window.KineflexAuth) KineflexAuth.mountAccountWidget('accountStatus');
 });
 </script>
 

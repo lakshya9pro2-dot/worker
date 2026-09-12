@@ -663,8 +663,11 @@
     <script src="/js/progress.js"></script>
     <script src="/js/player.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            KineflexAuth.mountAccountWidget('accountStatus');
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.KineflexAuth) {
+                await window.KineflexAuth.init();
+                KineflexAuth.mountAccountWidget('accountStatus');
+            }
         });
     </script>
 

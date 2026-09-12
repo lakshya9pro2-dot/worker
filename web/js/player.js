@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // Ensure SSO code exchange / auth session check is complete before playback starts
+    if (window.KineflexAuth && typeof window.KineflexAuth.init === 'function') {
+        try {
+            await window.KineflexAuth.init();
+        } catch (e) {
+            console.warn("KineflexAuth init warning:", e);
+        }
+    }
+
     const params = new URLSearchParams(window.location.search);
     const requestId = params.get('requestId');
     const playId = params.get('playId');
@@ -6,6 +15,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const errorElem = document.getElementById('playerError');
     
     let playUrl = null;
+    let videoMeta = {
+        id: params.get('id') || params.get('videoId'),
+        type: params.get('type') || 'movies',
+        season: params.get('s') || params.get('season') || 0,
+        episode: params.get('e') || params.get('episode') || 0
+    };
 
     // IMPORTANT: Replace this with your actual Cloudflare Worker URL
     const API_BASE = "https://worker.kineflex-netflex.workers.dev";
@@ -17,22 +32,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await res.json();
             if (data.success && data.session && data.session.result && data.session.result.url) {
                 playUrl = data.session.result.url;
-                
-                // Initialize WatchProgress
-                if (data.session.meta && window.WatchProgress) {
-                    const meta = data.session.meta;
-                    window.watchProgress = new WatchProgress({
-                        videoId: meta.id,
-                        mediaType: meta.type || 'movies',
-                        seasonNumber: meta.season,
-                        episodeNumber: meta.episode,
-                        getCurrentTime: () => videoElem.currentTime,
-                        getDuration: () => videoElem.duration,
-                        seekTo: (time) => { videoElem.currentTime = time; }
-                    });
-                    
-                    videoElem.addEventListener('timeupdate', () => window.watchProgress.saveProgress());
-                    videoElem.addEventListener('pause', () => window.watchProgress.saveProgress(true));
+                if (data.session.meta) {
+                    videoMeta = {
+                        id: data.session.meta.id || videoMeta.id,
+                        type: data.session.meta.type || videoMeta.type,
+                        season: data.session.meta.season || videoMeta.season,
+                        episode: data.session.meta.episode || videoMeta.episode
+                    };
                 }
             } else {
                 showError("Session expired or invalid playback data.");
@@ -43,8 +49,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
     } else if (playId) {
-        // Resolve playId. For now, since we don't have a direct play provider logic built-in to the worker
-        // except for the fallback, we'll simulate a provider abstraction as requested in Section 12.
         try {
             const resolved = await resolvePlayId(playId);
             if (resolved && resolved.success) {
@@ -57,9 +61,41 @@ document.addEventListener('DOMContentLoaded', async () => {
             showError("Error resolving play ID.");
             return;
         }
+    } else if (params.get('url')) {
+        playUrl = params.get('url');
     } else {
         showError("No video specified.");
         return;
+    }
+
+    // Initialize WatchProgress if video metadata is available
+    if (videoMeta.id && window.WatchProgress) {
+        window.watchProgress = new WatchProgress({
+            videoId: videoMeta.id,
+            mediaType: videoMeta.type || 'movies',
+            seasonNumber: videoMeta.season,
+            episodeNumber: videoMeta.episode,
+            getCurrentTime: () => videoElem.currentTime,
+            getDuration: () => videoElem.duration,
+            seekTo: (time) => { videoElem.currentTime = time; }
+        });
+
+        const triggerResume = () => {
+            if (window.watchProgress) window.watchProgress.attemptResume();
+        };
+
+        videoElem.addEventListener('loadedmetadata', triggerResume);
+        videoElem.addEventListener('canplay', triggerResume);
+        videoElem.addEventListener('playing', triggerResume);
+        videoElem.addEventListener('timeupdate', () => {
+            if (window.watchProgress) {
+                window.watchProgress.attemptResume();
+                window.watchProgress.saveProgress();
+            }
+        });
+        videoElem.addEventListener('pause', () => {
+            if (window.watchProgress) window.watchProgress.saveProgress(true);
+        });
     }
 
     if (playUrl) {
