@@ -11,6 +11,44 @@
             margin: 4rem auto;
             padding: 2rem;
         }
+        .btn-google {
+            background: #ffffff;
+            color: #1f1f1f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 1px solid #ddd;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            transition: background .2s, box-shadow .2s;
+            border-radius: 4px;
+            padding: 0.85rem 1rem;
+            width: 100%;
+        }
+        .btn-google:hover {
+            background: #f8f9fa;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.25rem 0;
+            color: #777;
+            font-size: 0.8rem;
+        }
+        .auth-divider::before, .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #333;
+        }
+        .auth-divider span {
+            padding: 0 10px;
+            font-weight: 600;
+        }
         .tabs {
             display: flex;
             margin-bottom: 1.5rem;
@@ -64,6 +102,20 @@
         </div>
 
         <div id="formView">
+            <button type="button" class="btn-google" id="googleSignInBtn">
+                <svg width="18" height="18" viewBox="0 0 18 18">
+                    <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.49h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.92a8.78 8.78 0 0 0 2.68-6.62z"/>
+                    <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.26c-.8.54-1.83.87-3.05.87-2.34 0-4.33-1.58-5.04-3.71H.95v2.33A8.997 8.997 0 0 0 9 18z"/>
+                    <path fill="#FBBC05" d="M3.96 10.72A5.4 5.4 0 0 1 3.68 9c0-.6.1-1.18.28-1.72V4.95H.95A8.996 8.996 0 0 0 0 9c0 1.45.35 2.82.95 4.05l3.01-2.33z"/>
+                    <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A8.997 8.997 0 0 0 .95 4.95l3.01 2.33c.71-2.13 2.7-3.7 5.04-3.7z"/>
+                </svg>
+                Continue with Google
+            </button>
+
+            <div class="auth-divider">
+                <span>OR</span>
+            </div>
+
             <div class="tabs">
                 <div class="tab active" id="signInTab">Sign In</div>
                 <div class="tab" id="signUpTab">Sign Up</div>
@@ -98,8 +150,9 @@
         const submitBtn = document.getElementById('submitBtn');
         const statusEl = document.getElementById('statusMessage');
         const passwordInput = document.getElementById('password');
+        const googleBtn = document.getElementById('googleSignInBtn');
 
-        let mode = 'signin'; // or 'signup'
+        let mode = 'signin';
 
         function setMode(next) {
             mode = next;
@@ -113,6 +166,13 @@
 
         signInTab.addEventListener('click', () => setMode('signin'));
         signUpTab.addEventListener('click', () => setMode('signup'));
+
+        googleBtn.addEventListener('click', () => {
+            const returnUrl = (redirectTo && redirectTo !== '/')
+                ? (redirectTo.startsWith('http') ? redirectTo : window.location.origin + redirectTo)
+                : window.location.origin + '/';
+            KineflexAuth.signInWithGoogle(returnUrl);
+        });
 
         function showStatus(message, isError) {
             statusEl.textContent = message;
@@ -130,9 +190,10 @@
         document.getElementById('continueBtn').addEventListener('click', () => {
             window.location.href = redirectTo;
         });
-        document.getElementById('signOutLink').addEventListener('click', (e) => {
+
+        document.getElementById('signOutLink').addEventListener('click', async (e) => {
             e.preventDefault();
-            KineflexAuth.signOut();
+            await KineflexAuth.signOut();
             document.getElementById('signedInView').style.display = 'none';
             document.getElementById('formView').style.display = 'block';
         });
@@ -161,15 +222,16 @@
                 showStatus('Success! Redirecting…', false);
                 setTimeout(() => { window.location.href = redirectTo; }, 500);
             } else {
-                // Sign-up succeeded but needs email confirmation first.
                 showStatus(result.message, false);
                 setMode('signin');
             }
         });
 
-        if (KineflexAuth.isSignedIn()) {
-            showSignedInView();
-        }
+        KineflexAuth.ready.then(() => {
+            if (KineflexAuth.isSignedIn()) {
+                showSignedInView();
+            }
+        });
     </script>
 </body>
 </html>

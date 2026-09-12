@@ -16,6 +16,12 @@ const app = {
     },
 
     async loadMovie() {
+        if (window.KineflexAuth) {
+            if (window.KineflexAuth.ready) await window.KineflexAuth.ready;
+            const auth = await window.KineflexAuth.ensureAuthenticated({ returnUrl: window.location.href, autoRedirect: true });
+            if (!auth || !auth.ok) return;
+        }
+
         const pathParts = window.location.pathname.split('/');
         // expected: /movie/123
         const id = pathParts[2];
@@ -29,6 +35,12 @@ const app = {
     },
 
     async loadTv() {
+        if (window.KineflexAuth) {
+            if (window.KineflexAuth.ready) await window.KineflexAuth.ready;
+            const auth = await window.KineflexAuth.ensureAuthenticated({ returnUrl: window.location.href, autoRedirect: true });
+            if (!auth || !auth.ok) return;
+        }
+
         const pathParts = window.location.pathname.split('/');
         // expected: /tv/123/1/2
         const id = pathParts[2];
